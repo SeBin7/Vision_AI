@@ -1,8 +1,8 @@
-# Exportable code
+# 배포용 코드 (Exportable Code)
 
-Exportable code is a .zip archive that contains simple demo to get and visualize result of model inference.
+이 압축 파일은 학습된 모델을 활용하여 추론(inference) 결과를 시각화할 수 있는 간단한 데모를 포함합니다.
 
-## Structure of generated zip
+## 압축 파일 구조
 
 - `README.md`
 - `LICENSE`
@@ -31,134 +31,81 @@ Exportable code is a .zip archive that contains simple demo to get and visualize
   - `requirements.txt`
   - `setup.py`
 
-## Prerequisites
+## 사전 준비 사항
 
 - [Python 3.10](https://www.python.org/downloads/)
 - [Git](https://git-scm.com/)
 
-## Install requirements to run demo
+## 데모 실행을 위한 설치 과정
 
-1. Install [prerequisites](#prerequisites). You may also need to [install pip](https://pip.pypa.io/en/stable/installation/). For example, on Ubuntu execute the following command to get pip installed:
+1. pip 설치 (Ubuntu 예시):
 
-   ```bash
-   sudo apt install python3-pip
-   ```
+sudo apt install python3-pip
 
-1. Create clean virtual environment:
 
-   One of the possible ways for creating a virtual environment is to use `virtualenv`:
+2. 가상환경 생성 및 활성화 (예: virtualenv 사용):
 
-   ```bash
-   python -m pip install virtualenv
-   python -m virtualenv <directory_for_environment>
-   ```
+python -m pip install virtualenv
+python -m virtualenv <가상환경_디렉토리>
+source <가상환경_디렉토리>/bin/activate # Windows는 .<...>\Scripts\activate
 
-   Before starting to work inside virtual environment, it should be activated:
 
-   On Linux and macOS:
+3. 필수 패키지 설치:
 
-   ```bash
-   source <directory_for_environment>/bin/activate
-   ```
+python -m pip install wheel
 
-   On Windows:
 
-   ```bash
-   .\<directory_for_environment>\Scripts\activate
-   ```
+4. 데모 패키지 설치:
 
-   Please make sure that the environment contains [wheel](https://pypi.org/project/wheel/) by calling the following command:
+cd python
+python setup.py install
 
-   ```bash
-   python -m pip install wheel
-   ```
 
-   > **NOTE**: On Linux and macOS, you may need to type `python3` instead of `python`.
+## 사용법
 
-1. Install requirements in the environment:
+1. 도움말 확인:
 
-   ```bash
-   cd python
-   python setup.py install
-   ```
+python3 demo.py -h
 
-## Usecase
 
-1. Running the `demo.py` application with the `-h` option yields the following usage message:
+2. 추론 실행 예시 (비디오 파일 입력):
 
-   ```bash
-   usage: demo.py [-h] -i INPUT -m MODEL [MODEL ...] [-it {sync,async}] [-l] [--no_show] [-d {CPU,GPU}] [--output OUTPUT]
+python3 demo.py -i <비디오_경로>/inputVideo.mp4
 
-   Options:
-   -h, --help            Show this help message and exit.
-   -i INPUT, --input INPUT
-                           Required. An input to process. The input must be a single image, a folder of images, video file or camera id.
-   -m MODEL [MODEL ...], --model MODELS [MODELS ...]
-                           Optional. Path to directory with trained model and configuration file. Default value points to deployed model folder '../model'.
-   -it {sync,async}, --inference_type {sync,async}
-                           Optional. Type of inference for single model.
-   -l, --loop            Optional. Enable reading the input in a loop.
-   --no_show             Optional. Disables showing inference results on UI.
-   -d {CPU,GPU}, --device {CPU,GPU}
-                           Optional. Device to infer the model.
-   --output OUTPUT       Optional. Output path to save input data with predictions.
-   ```
 
-2. As a `model` parameter the default value `../model` will be used. Or you can specify the other path to the model directory from generated zip. You can pass as `input` a single image, a folder of images, a video file, or a web camera id. So you can use the following command to do inference with a pre-trained model:
+- `Q` 키를 누르면 종료
+- 단일 이미지의 경우 빠르게 종료되며, 지속 시각화를 원할 경우 `--loop` 옵션 사용
 
-   ```bash
-   python3 demo.py -i <path_to_video>/inputVideo.mp4
-   ```
+3. 추론 결과 저장 예시:
 
-   You can press `Q` to stop inference during demo running.
+python3 demo.py --input <이미지_경로>/input.jpg --models ../model --output 결과저장폴더
 
-   > **NOTE**: If you provide a single image as input, the demo processes and renders it quickly, then exits. To continuously
-   > visualize inference results on the screen, apply the `--loop` option, which enforces processing a single image in a loop.
-   > In this case, you can stop the demo by pressing `Q` button or killing the process in the terminal (`Ctrl+C` for Linux).
-   >
-   > **NOTE**: Default configuration contains info about pre- and post processing for inference and is guaranteed to be correct.
-   > Also you can change `config.json` that specifies the confidence threshold and color for each class visualization, but any
-   > changes should be made with caution.
 
-3. To save inferenced results with predictions on it, you can specify the folder path, using `--output`.
-   It works for images, videos, image folders and web cameras. To prevent issues, do not specify it together with a `--loop` parameter.
+⚠ `--loop`와 `--output`은 함께 사용하지 말 것
 
-   ```bash
-   python3 demo.py \
-      --input <path_to_image>/inputImage.jpg \
-      --models ../model \
-      --output resulted_images
-   ```
+4. 웹캠으로 실행하기:
 
-4. To run a demo on a web camera, you need to know its ID.
-   You can check a list of camera devices by running this command line on Linux system:
+sudo apt-get install v4l-utils
+v4l2-ctl --list-devices
 
-   ```bash
-   sudo apt-get install v4l-utils
-   v4l2-ctl --list-devices
-   ```
 
-   The output will look like this:
+예시 출력:
 
-   ```bash
-   Integrated Camera (usb-0000:00:1a.0-1.6):
-      /dev/video0
-   ```
+Integrated Camera (usb-...):
+/dev/video0
 
-   After that, you can use this `/dev/video0` as a camera ID for `--input`.
 
-## Troubleshooting
+→ `/dev/video0`를 `--input` 값으로 사용
 
-1. If you have access to the Internet through the proxy server only, please use pip with proxy call as demonstrated by command below:
+## 문제 해결 (Troubleshooting)
 
-   ```bash
-   python -m pip install --proxy http://<usr_name>:<password>@<proxyserver_name>:<port#> <pkg_name>
-   ```
+1. 프록시 환경에서 pip 사용:
 
-1. If you use Anaconda environment, you should consider that OpenVINO has limited [Conda support](https://docs.openvino.ai/2021.4/openvino_docs_install_guides_installing_openvino_conda.html) for Python 3.6 and 3.7 versions only. But the demo package requires python 3.8. So please use other tools to create the environment (like `venv` or `virtualenv`) and use `pip` as a package manager.
+python -m pip install --proxy http://<아이디>:<비밀번호>@<프록시서버>:<포트번호> <패키지명>
 
-1. If you have problems when you try to use `pip install` command, please update pip version by following command:
 
-   ```bash
-   python -m pip install --upgrade pip
-   ```
+2. Anaconda 환경은 OpenVINO가 Python 3.6/3.7에서만 제한적으로 지원되므로, `venv` 또는 `virtualenv` 사용 권장
+
+3. pip 문제 해결:
+
+python -m pip install --upgrade pip
